@@ -5,32 +5,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Входящие заявки</title>
   <style>
-    body { max-width: 40rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
-    textarea { box-sizing: border-box; display: block; width: 100%; margin: .5rem 0; padding: .5rem; font: inherit; }
-    button { padding: .4rem .8rem; font: inherit; }
-    pre { white-space: pre-wrap; }
+    :root { color-scheme: light; font: 16px/1.55 system-ui, sans-serif; color: #172b30; background: #f3f6f5; }
+    * { box-sizing: border-box; }
+    body { max-width: 70rem; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+    .brand { color: #296b5c; font-size: .8rem; font-weight: 750; letter-spacing: .13em; }
+    h1 { margin: 1.5rem 0 .5rem; font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1.2; letter-spacing: -.035em; }
+    .intro { max-width: 42rem; margin: 0 0 2rem; color: #566a6b; }
+    .workspace { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: start; }
+    .panel { background: white; border: 1px solid #dce5e1; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 4px 16px #172b3004; }
+    .eyebrow { margin: 0 0 .35rem; color: #6d807c; font-size: .72rem; letter-spacing: .12em; font-weight: 700; }
+    h2 { margin: 0; font-size: 1.15rem; }
+    .panel-header { display: flex; gap: .75rem; align-items: start; justify-content: space-between; margin-bottom: 1.25rem; }
+    label { display: block; margin: 1.15rem 0 .4rem; font-weight: 650; font-size: .9rem; }
+    textarea, select { display: block; width: 100%; padding: .8rem; border: 1px solid #bdccc5; border-radius: .55rem; color: inherit; background: #fff; font: inherit; }
+    textarea { min-height: 9.5rem; resize: vertical; }
+    textarea::placeholder { color: #82918c; }
+    textarea:disabled, select:disabled { background: #f7f9f8; color: #6f7f78; opacity: 1; }
+    textarea[aria-invalid="true"] { border-color: #ae4a3f; }
+    :focus-visible { outline: 3px solid #8bc7b5; outline-offset: 3px; }
+    .hint { color: #6b7a76; font-size: .8rem; margin: .55rem 0 0; }
+    button { margin-top: 1.35rem; padding: .8rem 1.1rem; border: 0; border-radius: .55rem; background: #216c58; color: white; font: inherit; font-weight: 650; cursor: pointer; }
+    button:hover { background: #185642; }
+    .badge { flex-shrink: 0; margin-top: .2rem; padding: .25rem .6rem; border-radius: 2rem; background: #eef3f0; color: #536d60; font-size: .72rem; font-weight: 650; }
+    .status { padding: .85rem 1rem; margin: 0 0 1rem; border-radius: .55rem; background: #f2f6f4; color: #526a5e; font-size: .9rem; }
+    [data-status="ready"] .badge, [data-status="ready"] .status { background: #e9f5ee; color: #286446; }
+    [data-status="manual_review"] .badge, [data-status="manual_review"] .status { background: #fff3df; color: #80581f; }
+    [data-status="invalid_input"] .badge, [data-status="invalid_input"] .status { background: #fbefec; color: #9b4438; }
+    [data-status="loading"] .badge { background: #e9f1fc; color: #3a6286; }
+    .footer-note { margin: 1.25rem 0 0; color: #6b7a76; font-size: .8rem; }
+    @media (max-width: 48rem) {
+      body { padding: 1.5rem 1rem 2rem; }
+      .workspace { grid-template-columns: 1fr; }
+      .panel { padding: 1.2rem; }
+      .panel-header { flex-wrap: wrap; }
+      button { width: 100%; }
+    }
   </style>
 </head>
 <body>
-  <h1>Входящие заявки</h1>
-  <form>
-    <label for="message">Текст заявки</label>
-    <textarea id="message" rows="4"></textarea>
-    <button type="submit">Разобрать заявку</button>
-  </form>
-  <pre id="result" aria-live="polite"></pre>
-  <script type="module">
-    const form = document.querySelector("form");
-    const result = document.querySelector("#result");
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const reply = await fetch("/api/triage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: document.querySelector("#message").value }),
-      });
-      result.textContent = JSON.stringify(await reply.json(), null, 2);
-    });
-  </script>
+  <header>
+    <div class="brand">NEOWISE / ПОМОЩНИК МЕНЕДЖЕРА</div>
+    <h1>Входящие заявки</h1>
+    <p class="intro">Определите тему и подготовьте ответ. Проверьте черновик перед отправкой клиенту.</p>
+  </header>
+  <main class="workspace">
+    <section class="panel" aria-labelledby="input-heading">
+      <p class="eyebrow">01 / ЗАЯВКА</p>
+      <h2 id="input-heading">Что написал клиент?</h2>
+      <form id="triage-form" novalidate>
+        <label for="message">Текст заявки</label>
+        <textarea id="message" rows="7" aria-describedby="message-hint status" placeholder="Например: подскажите стоимость и сроки доставки." spellcheck="true"></textarea>
+        <p id="message-hint" class="hint">Исходный текст останется доступен для ручного разбора.</p>
+        <button id="submit" type="submit">Подготовить черновик</button>
+      </form>
+    </section>
+    <section id="result" class="panel" data-status="idle" aria-labelledby="result-heading">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">02 / РЕЗУЛЬТАТ</p>
+          <h2 id="result-heading">Ответ на заявку</h2>
+        </div>
+        <span id="status-badge" class="badge">Ожидает заявку</span>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true">Введите текст заявки — здесь появится результат разбора.</p>
+      <label for="topic">Тема</label>
+      <select id="topic" disabled>
+        <option value="">Выберите тему</option>
+        <option value="delivery">Доставка</option>
+        <option value="pricing">Стоимость</option>
+        <option value="other">Другое</option>
+      </select>
+      <label for="draft">Черновик ответа</label>
+      <textarea id="draft" rows="5" placeholder="Здесь можно написать ответ вручную." disabled spellcheck="true"></textarea>
+      <p class="footer-note">Тему и текст можно изменить. Отправку клиенту выполняет менеджер.</p>
+    </section>
+  </main>
+  <noscript><p>Для автоматического разбора включите JavaScript в браузере.</p></noscript>
+  <script type="module" src="/app.mjs"></script>
 </body>
 </html>
