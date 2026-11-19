@@ -3,152 +3,147 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f5f6fb">
-  <title>Входящие заявки · Neowise</title>
+  <meta name="theme-color" content="#f6f7f8">
+  <title>Разбор заявки · Neowise</title>
   <style>
     :root {
       color-scheme: light;
-      font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: #252940;
-      background: #f5f6fb;
-      --accent: #6651d9;
-      --muted: #676e82;
-      --line: #e5e7f0;
+      font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #22252a;
+      background: #f6f7f8;
+      --ink: #22252a;
+      --muted: #636a73;
+      --line: #dce0e4;
+      --control-line: #87919c;
+      --surface: #fff;
+      --focus: #426688;
     }
     * { box-sizing: border-box; }
     body { margin: 0; min-width: 280px; }
     button, textarea, select { font: inherit; }
+    button, select { touch-action: manipulation; }
     svg { display: block; flex-shrink: 0; }
-    .topbar { background: #fff; border-bottom: 1px solid var(--line); }
-    .topbar-inner { max-width: 1224px; min-height: 76px; padding: 0 32px; margin: auto; display: flex; align-items: center; gap: 22px; }
-    .brand { display: flex; align-items: center; gap: 10px; color: #28243f; }
-    .brand-mark { width: 36px; height: 36px; padding: 8px; border-radius: 11px; color: #fff; background: var(--accent); box-shadow: 0 4px 10px #6651d920; }
-    .brand-name { font-size: 26px; font-weight: 750; letter-spacing: -1.2px; }
-    .brand-divider { width: 1px; height: 24px; background: var(--line); }
-    .app-name { color: var(--muted); font-size: 13px; }
-    .assistant-label { margin-left: auto; display: flex; align-items: center; gap: 7px; padding: 5px 11px; border: 1px solid #e8e1fb; border-radius: 20px; color: #6e59af; background: #f9f7ff; font-size: 12px; font-weight: 600; }
-    .page { max-width: 1224px; margin: auto; padding: 30px 32px 28px; }
-    .breadcrumb { display: flex; align-items: center; gap: 9px; color: #6a7084; font-size: 12px; }
-    .breadcrumb strong { color: #51576e; font-weight: 550; }
-    .breadcrumb-separator { color: #a1a6b8; margin: 0 2px; }
-    .heading-row { display: flex; justify-content: space-between; align-items: center; gap: 28px; margin: 23px 0 29px; }
-    h1 { margin: 0 0 8px; font-size: clamp(28px, 3.4vw, 38px); font-weight: 720; line-height: 1.2; letter-spacing: -1.35px; }
-    .intro { margin: 0; color: var(--muted); font-size: 15px; }
-    .human-note { display: flex; align-items: center; gap: 11px; max-width: 226px; flex-shrink: 0; color: #6a7084; font-size: 12px; line-height: 1.6; }
-    .human-note-icon { width: 40px; height: 40px; display: grid; place-items: center; flex-shrink: 0; border: 1px solid #e2e4ee; border-radius: 50%; color: #7b7299; background: #fff; }
-    .human-note strong { display: block; color: #4b4c65; font-weight: 650; }
-    .workspace { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; gap: 22px; }
-    .panel { min-width: 0; min-height: 540px; padding: 26px; border: 1px solid #e3e5ef; border-radius: 19px; background: #fff; box-shadow: 0 3px 7px #25244002, 0 14px 35px #25244004; }
-    .input-panel { display: flex; flex-direction: column; }
-    .panel-header { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; column-gap: 12px; margin-bottom: 24px; }
-    .panel-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; color: #75648e; background: #f3f0f8; }
-    .result-icon { color: #715bd3; background: #f0ecfd; }
-    h2 { margin: 0 0 2px; font-size: 18px; font-weight: 680; line-height: 1.4; letter-spacing: -.35px; }
-    .panel-caption { margin: 0; color: #6a7084; font-size: 12px; line-height: 1.5; }
-    .step { align-self: start; color: #6f758a; font-size: 12px; font-weight: 550; font-variant-numeric: tabular-nums; }
-    form { display: flex; flex-direction: column; flex: 1; }
-    label { display: block; margin: 0 0 9px; color: #4b5066; font-size: 13px; font-weight: 650; }
-    textarea, select { display: block; width: 100%; border: 1px solid #cbd0df; border-radius: 11px; color: #34394f; background: #fafbfe; transition: border-color .15s, box-shadow .15s, background .15s; }
-    textarea { min-height: 150px; padding: 15px 16px; resize: vertical; font-size: 15px; line-height: 1.75; }
-    #message { flex: 1; min-height: 221px; }
-    textarea::placeholder { color: #6b7286; opacity: 1; }
-    textarea:hover, select:hover { border-color: #a8adc3; }
-    textarea:focus, select:focus { outline: none; border-color: #8e7adf; background-color: #fff; box-shadow: 0 0 0 3px #6e54df13; }
-    textarea:disabled, select:disabled { background: #f8f9fc; color: #73798b; opacity: 1; cursor: default; }
-    textarea[aria-invalid="true"] { border-color: #c66c7a; background: #fffbfc; }
-    :focus-visible { outline: 3px solid #a28bea; outline-offset: 4px; }
-    .hint { display: flex; align-items: flex-start; gap: 6px; margin: 10px 0 21px; color: #6d7387; font-size: 12px; line-height: 1.6; }
-    .hint svg { margin-top: 3px; }
-    .submit { display: flex; align-items: center; justify-content: center; gap: 9px; min-height: 50px; width: 100%; padding: 12px 18px; border: 1px solid #5d49cb; border-radius: 10px; color: #fff; background: linear-gradient(180deg, #735de4, #634ed3); box-shadow: 0 3px 6px #4c36b51c, inset 0 1px #ffffff24; font-size: 14px; font-weight: 650; cursor: pointer; transition: transform .15s, box-shadow .15s, background .15s; }
-    .submit::before { content: ""; flex-shrink: 0; width: 17px; height: 17px; background: currentColor; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 2 2.8 7.2L22 12l-7.2 2.8L12 22l-2.8-7.2L2 12l7.2-2.8L12 2Z'/%3E%3C/svg%3E") center/contain no-repeat; }
-    .submit:hover { background: linear-gradient(180deg, #6651da, #5743c5); box-shadow: 0 5px 12px #4c36b529; }
+    h1, h2 { text-wrap: balance; }
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--line); }
+    .topbar-inner { max-width: 1248px; min-height: 66px; margin: auto; padding: 0 40px; display: flex; align-items: center; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 10px; color: #202328; }
+    .brand-mark { width: 30px; height: 30px; }
+    .brand-name { font-size: 23px; font-weight: 600; letter-spacing: -.035em; line-height: 1; }
+    .app-name { padding-left: 24px; border-left: 1px solid var(--line); color: var(--muted); font-size: 13px; letter-spacing: .015em; }
+    .topbar-note { margin-left: auto; color: var(--muted); display: flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: .015em; }
+    .page { max-width: 1248px; margin: auto; padding: 42px 40px 32px; }
+    .page-heading { margin-bottom: 27px; }
+    h1 { margin: 0 0 9px; font-size: 30px; font-weight: 600; line-height: 1.2; letter-spacing: -.025em; }
+    .intro { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; text-wrap: pretty; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); border: 1px solid #d4d9de; border-radius: 10px; background: var(--surface); overflow: hidden; }
+    .panel { min-width: 0; display: flex; flex-direction: column; }
+    .input-panel { background: #fafbfc; border-right: 1px solid var(--line); }
+    .panel-header { min-height: 66px; padding: 16px 26px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); }
+    .panel-header > svg { color: #69717b; }
+    h2 { margin: 0; font-size: 15px; line-height: 1.4; font-weight: 600; }
+    .panel-body { padding: 26px; flex: 1; }
+    form { display: flex; flex-direction: column; }
+    label { display: block; margin-bottom: 10px; color: #41474f; font-size: 13px; line-height: 1.4; font-weight: 500; letter-spacing: .015em; }
+    textarea, select { display: block; width: 100%; border: 1px solid var(--control-line); border-radius: 6px; color: var(--ink); background-color: #fff; transition: border-color .12s, box-shadow .12s; }
+    textarea { padding: 16px; font-size: 15px; line-height: 1.75; resize: vertical; }
+    textarea::placeholder { color: #69727d; opacity: 1; }
+    #message { min-height: 284px; flex: 1; }
+    textarea:hover, select:hover { border-color: #858f9b; }
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+    textarea:focus, select:focus { outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px #42668818; }
+    textarea:disabled, select:disabled { color: #68717c; border-color: #dce0e4; background-color: #fbfcfd; opacity: 1; cursor: default; }
+    textarea[aria-invalid="true"] { border-color: #b64b43; }
+    .input-note { min-height: 62px; padding-top: 11px; }
+    .hint { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; letter-spacing: .015em; }
+    .input-error { display: none; color: #a23831; }
+    #message[aria-invalid="true"] + .input-note .input-error { display: block; }
+    #message[aria-invalid="true"] + .input-note .input-help { display: none; }
+    .form-actions { display: flex; align-items: center; padding-top: 5px; }
+    .submit { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 13px; padding: 11px 16px; border: 1px solid #22252a; border-radius: 6px; background: #262a30; color: #fff; font-size: 13px; line-height: 1.4; font-weight: 500; letter-spacing: .015em; cursor: pointer; transition: background .12s, transform .12s; }
+    .submit::after { content: ""; width: 15px; height: 15px; flex-shrink: 0; background: currentColor; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4 10h12m-5-5 5 5-5 5' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+    .submit:hover { background: #111419; }
     .submit:active { transform: translateY(1px); }
-    .result-panel { position: relative; overflow: hidden; }
-    .result-panel::before { content: ""; position: absolute; top: 0; left: 26px; right: 26px; height: 2px; background: linear-gradient(90deg, #b6a5ed, #e9e1fc); }
-    .badge { display: inline-flex; align-items: center; justify-self: end; gap: 5px; padding: 4px 8px; border-radius: 6px; color: #656c80; background: #f1f3f8; font-size: 12px; font-weight: 600; white-space: nowrap; }
-    .badge::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .7; }
-    .status-box { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 21px; padding: 12px 13px; border: 1px solid #e7e9f2; border-radius: 10px; color: #6c7188; background: #f8f9fc; }
-    .status-symbol { margin-top: 3px; }
-    .status { margin: 0; font-size: 13px; line-height: 1.65; }
-    .status-check, .status-warning { display: none; }
-    .result-fields label:not(:first-child) { margin-top: 20px; }
-    select { min-height: 46px; padding: 10px 38px 10px 14px; appearance: none; font-size: 14px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m6 8 4 4 4-4' fill='none' stroke='%23777d91' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; }
-    #draft { min-height: 156px; background: #fff; }
-    .draft-hint { display: flex; align-items: flex-start; gap: 6px; margin: 11px 0 0; color: #666d81; font-size: 12px; line-height: 1.6; }
-    .draft-hint svg { margin-top: 3px; }
-    .empty-state { display: none; flex-direction: column; align-items: center; text-align: center; padding: 11px 12px 16px; }
-    .empty-illustration { width: 142px; height: 137px; margin-bottom: 12px; }
-    .empty-state h3 { margin: 0 0 7px; color: #555a76; font-size: 17px; font-weight: 650; letter-spacing: -.2px; }
-    .empty-state p { max-width: 280px; margin: 0; color: #6d7387; font-size: 13px; line-height: 1.7; }
-    .topic-hints { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 20px; }
-    .topic-hints span { padding: 3px 9px; border: 1px solid #e7e8f1; border-radius: 6px; color: #6f748b; background: #fdfdff; font-size: 12px; }
-    .loading-copy { display: none; }
-    [data-status="idle"] .result-fields, [data-status="loading"] .result-fields, [data-status="invalid_input"] .result-fields { display: none; }
-    [data-status="idle"] .empty-state, [data-status="loading"] .empty-state, [data-status="invalid_input"] .empty-state { display: flex; }
-    [data-status="ready"] .badge { color: #2a7855; background: #eaf6ef; }
-    [data-status="ready"] .status-box { color: #43745a; background: #f1faf4; border-color: #dcefe3; }
-    [data-status="ready"] .status-info, [data-status="manual_review"] .status-info, [data-status="invalid_input"] .status-info { display: none; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; padding: 4px 8px; color: #626b77; background: #f2f4f6; border: 1px solid #e4e7ea; border-radius: 5px; font-size: 11px; font-weight: 500; line-height: 1.4; letter-spacing: .015em; white-space: nowrap; }
+    .badge::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .result-body { display: flex; flex-direction: column; }
+    .status-box { display: flex; align-items: flex-start; gap: 9px; min-height: 59px; margin: 0 0 19px; padding: 0 0 18px; border-bottom: 1px solid #e9ecef; color: var(--muted); }
+    .status-symbol { margin-top: 2px; }
+    .status { margin: 0; max-width: 56ch; font-size: 13px; line-height: 1.6; letter-spacing: .005em; text-wrap: pretty; }
+    .status-check, .status-warning, .status-loading { display: none; }
+    .result-fields { display: flex; flex-direction: column; flex: 1; }
+    .topic-row { display: flex; align-items: center; gap: 18px; padding-bottom: 22px; }
+    .topic-row label { margin: 0; }
+    select { width: 190px; min-height: 40px; padding: 9px 36px 9px 12px; appearance: none; font-size: 13px; line-height: 1.5; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m6 8 4 4 4-4' fill='none' stroke='%23636a73' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; }
+    #draft { min-height: 227px; flex: 1; }
+    .draft-note { display: flex; gap: 7px; align-items: flex-start; margin-top: 13px; }
+    .draft-note svg { margin-top: 2px; }
+    [data-status="ready"] .badge { color: #28654b; background: #f0f7f3; border-color: #d8e9df; }
+    [data-status="ready"] .status-box { color: #38634e; }
+    [data-status="ready"] .status-info, [data-status="manual_review"] .status-info, [data-status="invalid_input"] .status-info, [data-status="loading"] .status-info { display: none; }
     [data-status="ready"] .status-check { display: block; }
-    [data-status="manual_review"] .badge { color: #8f6627; background: #fff2d9; }
-    [data-status="manual_review"] .status-box { color: #826437; background: #fff8ec; border-color: #f1e1c3; }
+    [data-status="manual_review"] .badge { color: #875b18; background: #fff7e9; border-color: #eddfc5; }
+    [data-status="manual_review"] .status-box { margin-top: -3px; padding: 11px 12px; color: #80561b; border: 1px solid #eddfc5; border-radius: 6px; background: #fffbf2; }
     [data-status="manual_review"] .status-warning, [data-status="invalid_input"] .status-warning { display: block; }
-    [data-status="manual_review"]::before { background: linear-gradient(90deg, #e1ba70, #f7e8cd); }
-    [data-status="invalid_input"] .badge { color: #a64b5a; background: #fcecef; }
-    [data-status="invalid_input"] .status-box { color: #a34d5b; background: #fff5f7; border-color: #f3dce1; }
-    [data-status="loading"] .badge { color: #7159bf; background: #f0ebfc; }
-    [data-status="loading"] .badge::before { animation: pulse 1s ease-in-out infinite; }
-    [data-status="loading"] .empty-illustration { animation: float 1.8s ease-in-out infinite; }
-    [data-status="loading"] .idle-copy { display: none; }
-    [data-status="loading"] .loading-copy { display: block; }
-    .page-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin: 22px 4px 0; color: #666d81; font-size: 12px; }
-    .page-footer p { display: flex; align-items: flex-start; gap: 7px; margin: 0; }
-    .page-footer svg { margin-top: 2px; }
-    .footer-brand { color: #6a7084; font-size: 12px; letter-spacing: .07em; white-space: nowrap; }
-    noscript p { max-width: 1160px; margin: 20px auto; padding: 0 24px; }
-    @keyframes pulse { 50% { opacity: .25; } }
-    @keyframes float { 50% { transform: translateY(-4px); } }
-    @media (max-width: 1080px) {
-      .topbar-inner, .page { padding-left: 24px; padding-right: 24px; }
-      .human-note { display: none; }
-      .result-panel .badge { grid-column: 2 / -1; justify-self: start; margin-top: 8px; }
-      .panel { padding: 23px; }
+    [data-status="invalid_input"] .badge { color: #a23831; background: #fcf1f0; border-color: #efd9d7; }
+    [data-status="invalid_input"] .status-box { color: #a23831; }
+    [data-status="loading"] .status-loading { display: block; animation: spin 1s linear infinite; }
+    [data-status="loading"] .badge::before { animation: pulse 1.2s ease-in-out infinite; }
+    .page-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 18px; color: var(--muted); font-size: 12px; letter-spacing: .015em; }
+    .page-footer p { margin: 0; }
+    .footer-flow { display: flex; align-items: center; gap: 8px; color: #68717c; white-space: nowrap; }
+    .footer-flow svg { color: #9198a1; }
+    noscript p { max-width: 1168px; margin: 24px auto; padding: 0 24px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse { 50% { opacity: .3; } }
+    @media (max-width: 1000px) {
+      .topbar-inner { padding: 0 28px; }
+      .page { padding: 32px 28px; }
+      .workspace { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+      .panel-header { padding: 16px 22px; flex-wrap: wrap; }
+      .panel-body { padding: 22px; }
+      .result-panel .badge { margin-left: 0; }
+      .result-panel .panel-header { column-gap: 9px; }
+      .topbar-note { display: none; }
     }
-    @media (max-width: 840px) {
-      .workspace { grid-template-columns: 1fr; gap: 20px; }
-      .panel { min-height: 0; }
-      #message { min-height: 220px; }
-      .result-panel .badge { grid-column: auto; justify-self: end; margin-top: 0; }
-      .empty-state { padding-bottom: 25px; }
+    @media (max-width: 760px) {
+      .workspace { grid-template-columns: 1fr; }
+      .input-panel { border-right: 0; border-bottom: 1px solid var(--line); }
+      .result-panel .badge { margin-left: auto; }
+      #message { min-height: 210px; }
+      #draft { min-height: 220px; }
+      .input-note { min-height: 55px; }
+      .status-box { min-height: 0; }
+      .form-actions { padding-top: 0; }
+      .footer-flow { display: none; }
     }
-    @media (max-width: 600px) {
-      .topbar-inner { min-height: 66px; gap: 14px; padding: 0 20px; }
-      .brand-name { font-size: 23px; }
-      .brand-mark { width: 33px; height: 33px; border-radius: 10px; }
-      .brand-divider, .app-name { display: none; }
-      .assistant-label { padding: 4px 9px; }
-      .page { padding: 23px 18px 24px; }
-      .heading-row { margin: 22px 0 24px; }
-      h1 { font-size: 30px; letter-spacing: -.9px; }
-      .intro { max-width: 340px; font-size: 14px; }
-      .panel { padding: 22px; border-radius: 16px; }
-      .panel-header { margin-bottom: 23px; }
-      h2 { font-size: 17px; }
-      #message { min-height: 200px; }
+    @media (max-width: 480px) {
+      .topbar-inner { min-height: 60px; padding: 0 20px; gap: 18px; }
+      .brand-name { font-size: 22px; }
+      .brand-mark { width: 28px; height: 28px; }
+      .app-name { padding-left: 18px; font-size: 12px; }
+      .page { padding: 28px 16px 24px; }
+      .page-heading { margin: 0 4px 22px; }
+      h1 { font-size: 27px; }
+      .intro { max-width: 30ch; font-size: 13px; }
+      .panel-header { min-height: 61px; padding: 16px 18px; gap: 8px; }
+      .panel-body { padding: 20px 18px; }
+      .workspace { border-radius: 8px; }
+      .submit { width: 100%; min-height: 46px; font-size: 14px; }
       textarea, select { font-size: 16px; }
-      .result-panel::before { left: 22px; right: 22px; }
-      .result-panel .badge { grid-column: 2 / -1; justify-self: start; margin-top: 8px; }
-      .empty-state { padding: 7px 0 21px; }
-      .page-footer { margin-top: 20px; }
-      .footer-brand { display: none; }
+      textarea { padding: 13px; }
+      select { width: 195px; min-height: 44px; }
+      .topic-row { gap: 15px; padding-bottom: 22px; }
+      .badge { padding: 4px 6px; gap: 4px; }
+      .page-footer { margin: 16px 4px 0; }
     }
     @media (max-width: 350px) {
-      .page { padding-left: 13px; padding-right: 13px; }
-      .panel { padding: 18px; }
-      .topbar-inner { padding: 0 15px; }
-      .brand-name { font-size: 21px; }
-      .assistant-label { padding: 4px 7px; }
-      .assistant-label svg { display: none; }
-      h2 { font-size: 16px; }
+      .app-name { display: none; }
+      .page { padding-left: 12px; padding-right: 12px; }
+      .panel-header { padding-left: 15px; padding-right: 15px; }
+      .panel-body { padding-left: 15px; padding-right: 15px; }
+      .result-panel .badge { margin-left: 26px; }
+      .topic-row { flex-wrap: wrap; gap: 9px; }
+      select { width: 100%; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -159,88 +154,73 @@
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand" role="img" aria-label="Neowise">
-        <svg class="brand-mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 18V6l14 12V6" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg class="brand-mark" viewBox="0 0 30 30" fill="none" aria-hidden="true"><path d="M5 24V6h4l12 18h4V6M5 6l20 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter"/></svg>
         <span class="brand-name" aria-hidden="true">neowise</span>
       </div>
-      <span class="brand-divider" aria-hidden="true"></span>
-      <span class="app-name">Помощник менеджера</span>
-      <span class="assistant-label"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4L12 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>AI-помощник</span>
+      <span class="app-name">Входящие заявки</span>
+      <span class="topbar-note"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 10h8M8 14h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Рабочее место менеджера</span>
     </div>
   </header>
-  <div class="page">
-    <div class="breadcrumb">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
-      <span>Рабочее пространство</span><span class="breadcrumb-separator" aria-hidden="true">/</span><strong>Входящие</strong>
+  <main class="page">
+    <div class="page-heading">
+      <h1>Разбор заявки</h1>
+      <p class="intro">Определите тему и подготовьте ответ на сообщение клиента.</p>
     </div>
-    <div class="heading-row">
-      <div><h1>Входящие заявки</h1><p class="intro">Превратите сообщение клиента в понятный черновик ответа.</p></div>
-      <div class="human-note">
-        <span class="human-note-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M5 20v-2a7 7 0 0 1 14 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
-        <span><strong>AI помогает. Вы решаете.</strong>Каждый ответ — под вашим контролем.</span>
-      </div>
-    </div>
-    <main class="workspace">
+    <div class="workspace">
       <section class="panel input-panel" aria-labelledby="input-heading">
         <div class="panel-header">
-          <span class="panel-icon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-8 8H5l-3 2v-10a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 9h8M7 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
-          <div><h2 id="input-heading">Сообщение клиента</h2><p class="panel-caption">Начнём с исходной заявки</p></div>
-          <span class="step" aria-hidden="true">01</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-8 8H5l-3 2v-10a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 9h8M7 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <h2 id="input-heading">Сообщение клиента</h2>
         </div>
-        <form id="triage-form" novalidate>
+        <form id="triage-form" class="panel-body" novalidate>
           <label for="message">Текст заявки</label>
-          <textarea id="message" rows="7" aria-describedby="message-hint status" placeholder="Например: здравствуйте! Подскажите стоимость и сроки доставки." spellcheck="true"></textarea>
-          <p id="message-hint" class="hint"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M12 11v5M12 7.5v.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Исходный текст остаётся доступен и при сбое.</p>
-          <button id="submit" class="submit" type="submit">Подготовить черновик</button>
+          <textarea id="message" name="message" rows="8" aria-describedby="message-hint" placeholder="Например:&#10;Здравствуйте! Подскажите, когда будет доставка заказа." spellcheck="true"></textarea>
+          <div class="input-note">
+            <p id="message-hint" class="hint input-help">Добавьте сообщение целиком — с деталями и вопросами.</p>
+            <p id="message-error" class="hint input-error">Введите текст заявки. Одних пробелов недостаточно.</p>
+          </div>
+          <div class="form-actions"><button id="submit" class="submit" type="submit">Подготовить черновик</button></div>
         </form>
       </section>
       <section id="result" class="panel result-panel" data-status="idle" aria-labelledby="result-heading">
         <div class="panel-header">
-          <span class="panel-icon result-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 19 10-10M13 7l4 4M4 20l3-1-2-2-1 3ZM17 3v3M21 7h-3M7 3v3M5.5 4.5h3M18 16v4M16 18h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          <div><h2 id="result-heading">Черновик ответа</h2><p class="panel-caption">Тема и текст для клиента</p></div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M13 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M10 14l1-4L19 2l3 3-8 8-4 1ZM17 4l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h2 id="result-heading">Результат разбора</h2>
           <span id="status-badge" class="badge">Ожидает заявку</span>
         </div>
-        <div class="status-box">
-          <svg class="status-symbol status-info" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M12 11v5M12 7.5v.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-          <svg class="status-symbol status-check" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="m8 12 3 3 5-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <svg class="status-symbol status-warning" width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m10.3 4.5-8 14A1.7 1.7 0 0 0 3.8 21h16.4a1.7 1.7 0 0 0 1.5-2.5l-8-14a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.5"/><path d="M12 9v5M12 17.2v.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-          <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true">Введите текст заявки — здесь появится результат разбора.</p>
-        </div>
-        <div class="empty-state">
-          <svg class="empty-illustration" viewBox="0 0 144 140" fill="none" aria-hidden="true">
-            <circle cx="71" cy="70" r="57" fill="#f4f1fc"/>
-            <circle cx="71" cy="70" r="43" stroke="#e8e0f8" stroke-dasharray="3 5"/>
-            <rect x="39" y="21" width="66" height="94" rx="10" fill="#e8e0f5" transform="rotate(8 72 68)"/>
-            <rect x="34" y="17" width="66" height="94" rx="10" fill="white" stroke="#dcd3ef"/>
-            <rect x="46" y="31" width="23" height="5" rx="2.5" fill="#ac97df"/>
-            <path d="M46 49h42M46 60h34M46 71h39M46 82h23" stroke="#e3dcee" stroke-width="4" stroke-linecap="round"/>
-            <circle cx="104" cy="98" r="22" fill="#7159d9" stroke="white" stroke-width="4"/>
-            <path d="m104 86 3.2 8.8L116 98l-8.8 3.2-3.2 8.8-3.2-8.8L92 98l8.8-3.2L104 86Z" fill="white"/>
-            <path d="M23 45v8M19 49h8M115 29v6M112 32h6" stroke="#c2afe8" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="25" cy="103" r="3" fill="#d9ccf0"/>
-          </svg>
-          <div class="idle-copy"><h3>Здесь появится ваш черновик</h3><p>Добавьте сообщение клиента, и помощник предложит тему и вариант ответа.</p></div>
-          <div class="loading-copy"><h3>Разбираемся в заявке</h3><p>Определяем тему и готовим ответ, который вы сможете отредактировать.</p></div>
-          <div class="topic-hints" aria-label="Доступные темы"><span>Доставка</span><span>Стоимость</span><span>Другое</span></div>
-        </div>
-        <div class="result-fields">
-          <label for="topic">Тема</label>
-          <select id="topic" disabled>
-            <option value="">Выберите тему</option>
-            <option value="delivery">Доставка</option>
-            <option value="pricing">Стоимость</option>
-            <option value="other">Другое</option>
-          </select>
-          <label for="draft">Черновик ответа</label>
-          <textarea id="draft" rows="5" placeholder="Напишите ответ клиенту…" disabled spellcheck="true"></textarea>
-          <p class="draft-hint"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 4 5 5M4 20l5-1L20 8a2 2 0 0 0-4-4L5 15l-1 5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Проверьте детали и добавьте нужные уточнения</p>
+        <div class="panel-body result-body">
+          <div class="status-box">
+            <svg class="status-symbol status-info" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M12 11v5M12 7.5v.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <svg class="status-symbol status-check" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="m8 12 3 3 5-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg class="status-symbol status-warning" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m10.3 4.5-8 14A1.7 1.7 0 0 0 3.8 21h16.4a1.7 1.7 0 0 0 1.5-2.5l-8-14a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.5"/><path d="M12 9v5M12 17.2v.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <svg class="status-symbol status-loading" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5" opacity=".2"/><path d="M12 4a8 8 0 0 1 8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true">Введите текст заявки — здесь появится результат разбора.</p>
+          </div>
+          <div class="result-fields">
+            <div class="topic-row">
+              <label for="topic">Тема</label>
+              <select id="topic" name="topic" disabled>
+                <option value="">Выберите тему</option>
+                <option value="delivery">Доставка</option>
+                <option value="pricing">Стоимость</option>
+                <option value="other">Другое</option>
+              </select>
+            </div>
+            <label for="draft">Черновик ответа</label>
+            <textarea id="draft" name="draft" rows="6" aria-describedby="draft-hint" placeholder="Напишите ответ клиенту…" disabled spellcheck="true"></textarea>
+            <div class="draft-note">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 4 5 5M4 20l5-1L20 8a2 2 0 0 0-4-4L5 15l-1 5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              <p id="draft-hint" class="hint">Проверьте детали и отредактируйте ответ перед отправкой.</p>
+            </div>
+          </div>
         </div>
       </section>
-    </main>
+    </div>
     <footer class="page-footer">
-      <p><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m8 12 3 3 5-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Ответ отправляете вы — после проверки и правок.</p>
-      <span class="footer-brand">NEOWISE WORKSPACE</span>
+      <p>Отправка клиенту — вручную, после вашей проверки.</p>
+      <span class="footer-flow" aria-hidden="true">Заявка<svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M3 10h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Тема<svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M3 10h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Ответ</span>
     </footer>
-  </div>
+  </main>
   <noscript><p>Для автоматического разбора включите JavaScript в браузере.</p></noscript>
   <script type="module" src="/app.mjs"></script>
 </body>

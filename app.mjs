@@ -135,6 +135,7 @@ if (typeof document !== "undefined") {
       topic.disabled = !editable;
       draft.disabled = !editable;
       input.setAttribute("aria-invalid", String(state.status === "invalid_input"));
+      input.setAttribute("aria-describedby", state.status === "invalid_input" ? "message-error" : "message-hint");
       form.setAttribute("aria-busy", String(state.status === "loading"));
       button.textContent = state.status === "loading" ? "Повторить разбор" : "Подготовить черновик";
     },
