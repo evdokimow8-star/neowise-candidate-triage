@@ -3,34 +3,225 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Входящие заявки</title>
+  <meta name="theme-color" content="#f6f7f8">
+  <title>Разбор заявки · Neowise</title>
   <style>
-    body { max-width: 40rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
-    textarea { box-sizing: border-box; display: block; width: 100%; margin: .5rem 0; padding: .5rem; font: inherit; }
-    button { padding: .4rem .8rem; font: inherit; }
-    pre { white-space: pre-wrap; }
+    :root {
+      color-scheme: light;
+      font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #22252a;
+      background: #f6f7f8;
+      --ink: #22252a;
+      --muted: #636a73;
+      --line: #dce0e4;
+      --control-line: #87919c;
+      --surface: #fff;
+      --focus: #426688;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 280px; }
+    button, textarea, select { font: inherit; }
+    button, select { touch-action: manipulation; }
+    svg { display: block; flex-shrink: 0; }
+    h1, h2 { text-wrap: balance; }
+    .topbar { background: var(--surface); border-bottom: 1px solid var(--line); }
+    .topbar-inner { max-width: 1248px; min-height: 66px; margin: auto; padding: 0 40px; display: flex; align-items: center; gap: 24px; }
+    .brand { display: flex; align-items: center; gap: 10px; color: #202328; }
+    .brand-mark { width: 30px; height: 30px; }
+    .brand-name { font-size: 23px; font-weight: 600; letter-spacing: -.035em; line-height: 1; }
+    .app-name { padding-left: 24px; border-left: 1px solid var(--line); color: var(--muted); font-size: 13px; letter-spacing: .015em; }
+    .topbar-note { margin-left: auto; color: var(--muted); display: flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: .015em; }
+    .page { max-width: 1248px; margin: auto; padding: 42px 40px 32px; }
+    .page-heading { margin-bottom: 27px; }
+    h1 { margin: 0 0 9px; font-size: 30px; font-weight: 600; line-height: 1.2; letter-spacing: -.025em; }
+    .intro { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; text-wrap: pretty; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); border: 1px solid #d4d9de; border-radius: 10px; background: var(--surface); overflow: hidden; }
+    .panel { min-width: 0; display: flex; flex-direction: column; }
+    .input-panel { background: #fafbfc; border-right: 1px solid var(--line); }
+    .panel-header { min-height: 66px; padding: 16px 26px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); }
+    .panel-header > svg { color: #69717b; }
+    h2 { margin: 0; font-size: 15px; line-height: 1.4; font-weight: 600; }
+    .panel-body { padding: 26px; flex: 1; }
+    form { display: flex; flex-direction: column; }
+    label { display: block; margin-bottom: 10px; color: #41474f; font-size: 13px; line-height: 1.4; font-weight: 500; letter-spacing: .015em; }
+    textarea, select { display: block; width: 100%; border: 1px solid var(--control-line); border-radius: 6px; color: var(--ink); background-color: #fff; transition: border-color .12s, box-shadow .12s; }
+    textarea { padding: 16px; font-size: 15px; line-height: 1.75; resize: vertical; }
+    textarea::placeholder { color: #69727d; opacity: 1; }
+    #message { min-height: 284px; flex: 1; }
+    textarea:hover, select:hover { border-color: #858f9b; }
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+    textarea:focus, select:focus { outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px #42668818; }
+    textarea:disabled, select:disabled { color: #68717c; border-color: #dce0e4; background-color: #fbfcfd; opacity: 1; cursor: default; }
+    textarea[aria-invalid="true"] { border-color: #b64b43; }
+    .input-note { min-height: 62px; padding-top: 11px; }
+    .hint { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; letter-spacing: .015em; }
+    .input-error { display: none; color: #a23831; }
+    #message[aria-invalid="true"] + .input-note .input-error { display: block; }
+    #message[aria-invalid="true"] + .input-note .input-help { display: none; }
+    .form-actions { display: flex; align-items: center; padding-top: 5px; }
+    .submit { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 13px; padding: 11px 16px; border: 1px solid #22252a; border-radius: 6px; background: #262a30; color: #fff; font-size: 13px; line-height: 1.4; font-weight: 500; letter-spacing: .015em; cursor: pointer; transition: background .12s, transform .12s; }
+    .submit::after { content: ""; width: 15px; height: 15px; flex-shrink: 0; background: currentColor; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4 10h12m-5-5 5 5-5 5' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+    .submit:hover { background: #111419; }
+    .submit:active { transform: translateY(1px); }
+    .badge { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; padding: 4px 8px; color: #626b77; background: #f2f4f6; border: 1px solid #e4e7ea; border-radius: 5px; font-size: 11px; font-weight: 500; line-height: 1.4; letter-spacing: .015em; white-space: nowrap; }
+    .badge::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .result-body { display: flex; flex-direction: column; }
+    .status-box { display: flex; align-items: flex-start; gap: 9px; min-height: 59px; margin: 0 0 19px; padding: 0 0 18px; border-bottom: 1px solid #e9ecef; color: var(--muted); }
+    .status-symbol { margin-top: 2px; }
+    .status { margin: 0; max-width: 56ch; font-size: 13px; line-height: 1.6; letter-spacing: .005em; text-wrap: pretty; }
+    .status-check, .status-warning, .status-loading { display: none; }
+    .result-fields { display: flex; flex-direction: column; flex: 1; }
+    .topic-row { display: flex; align-items: center; gap: 18px; padding-bottom: 22px; }
+    .topic-row label { margin: 0; }
+    select { width: 190px; min-height: 40px; padding: 9px 36px 9px 12px; appearance: none; font-size: 13px; line-height: 1.5; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m6 8 4 4 4-4' fill='none' stroke='%23636a73' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; }
+    #draft { min-height: 227px; flex: 1; }
+    .draft-note { display: flex; gap: 7px; align-items: flex-start; margin-top: 13px; }
+    .draft-note svg { margin-top: 2px; }
+    [data-status="ready"] .badge { color: #28654b; background: #f0f7f3; border-color: #d8e9df; }
+    [data-status="ready"] .status-box { color: #38634e; }
+    [data-status="ready"] .status-info, [data-status="manual_review"] .status-info, [data-status="invalid_input"] .status-info, [data-status="loading"] .status-info { display: none; }
+    [data-status="ready"] .status-check { display: block; }
+    [data-status="manual_review"] .badge { color: #875b18; background: #fff7e9; border-color: #eddfc5; }
+    [data-status="manual_review"] .status-box { margin-top: -3px; padding: 11px 12px; color: #80561b; border: 1px solid #eddfc5; border-radius: 6px; background: #fffbf2; }
+    [data-status="manual_review"] .status-warning, [data-status="invalid_input"] .status-warning { display: block; }
+    [data-status="invalid_input"] .badge { color: #a23831; background: #fcf1f0; border-color: #efd9d7; }
+    [data-status="invalid_input"] .status-box { color: #a23831; }
+    [data-status="loading"] .status-loading { display: block; animation: spin 1s linear infinite; }
+    [data-status="loading"] .badge::before { animation: pulse 1.2s ease-in-out infinite; }
+    .page-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 18px; color: var(--muted); font-size: 12px; letter-spacing: .015em; }
+    .page-footer p { margin: 0; }
+    .footer-flow { display: flex; align-items: center; gap: 8px; color: #68717c; white-space: nowrap; }
+    .footer-flow svg { color: #9198a1; }
+    noscript p { max-width: 1168px; margin: 24px auto; padding: 0 24px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse { 50% { opacity: .3; } }
+    @media (max-width: 1000px) {
+      .topbar-inner { padding: 0 28px; }
+      .page { padding: 32px 28px; }
+      .workspace { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+      .panel-header { padding: 16px 22px; flex-wrap: wrap; }
+      .panel-body { padding: 22px; }
+      .result-panel .badge { margin-left: 0; }
+      .result-panel .panel-header { column-gap: 9px; }
+      .topbar-note { display: none; }
+    }
+    @media (max-width: 760px) {
+      .workspace { grid-template-columns: 1fr; }
+      .input-panel { border-right: 0; border-bottom: 1px solid var(--line); }
+      .result-panel .badge { margin-left: auto; }
+      #message { min-height: 210px; }
+      #draft { min-height: 220px; }
+      .input-note { min-height: 55px; }
+      .status-box { min-height: 0; }
+      .form-actions { padding-top: 0; }
+      .footer-flow { display: none; }
+    }
+    @media (max-width: 480px) {
+      .topbar-inner { min-height: 60px; padding: 0 20px; gap: 18px; }
+      .brand-name { font-size: 22px; }
+      .brand-mark { width: 28px; height: 28px; }
+      .app-name { padding-left: 18px; font-size: 12px; }
+      .page { padding: 28px 16px 24px; }
+      .page-heading { margin: 0 4px 22px; }
+      h1 { font-size: 27px; }
+      .intro { max-width: 30ch; font-size: 13px; }
+      .panel-header { min-height: 61px; padding: 16px 18px; gap: 8px; }
+      .panel-body { padding: 20px 18px; }
+      .workspace { border-radius: 8px; }
+      .submit { width: 100%; min-height: 46px; font-size: 14px; }
+      textarea, select { font-size: 16px; }
+      textarea { padding: 13px; }
+      select { width: 195px; min-height: 44px; }
+      .topic-row { gap: 15px; padding-bottom: 22px; }
+      .badge { padding: 4px 6px; gap: 4px; }
+      .page-footer { margin: 16px 4px 0; }
+    }
+    @media (max-width: 350px) {
+      .app-name { display: none; }
+      .page { padding-left: 12px; padding-right: 12px; }
+      .panel-header { padding-left: 15px; padding-right: 15px; }
+      .panel-body { padding-left: 15px; padding-right: 15px; }
+      .result-panel .badge { margin-left: 26px; }
+      .topic-row { flex-wrap: wrap; gap: 9px; }
+      select { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
   </style>
 </head>
 <body>
-  <h1>Входящие заявки</h1>
-  <form>
-    <label for="message">Текст заявки</label>
-    <textarea id="message" rows="4"></textarea>
-    <button type="submit">Разобрать заявку</button>
-  </form>
-  <pre id="result" aria-live="polite"></pre>
-  <script type="module">
-    const form = document.querySelector("form");
-    const result = document.querySelector("#result");
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const reply = await fetch("/api/triage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: document.querySelector("#message").value }),
-      });
-      result.textContent = JSON.stringify(await reply.json(), null, 2);
-    });
-  </script>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" role="img" aria-label="Neowise">
+        <svg class="brand-mark" viewBox="0 0 30 30" fill="none" aria-hidden="true"><path d="M5 24V6h4l12 18h4V6M5 6l20 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter"/></svg>
+        <span class="brand-name" aria-hidden="true">neowise</span>
+      </div>
+      <span class="app-name">Входящие заявки</span>
+      <span class="topbar-note"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 10h8M8 14h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Рабочее место менеджера</span>
+    </div>
+  </header>
+  <main class="page">
+    <div class="page-heading">
+      <h1>Разбор заявки</h1>
+      <p class="intro">Определите тему и подготовьте ответ на сообщение клиента.</p>
+    </div>
+    <div class="workspace">
+      <section class="panel input-panel" aria-labelledby="input-heading">
+        <div class="panel-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-8 8H5l-3 2v-10a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 9h8M7 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <h2 id="input-heading">Сообщение клиента</h2>
+        </div>
+        <form id="triage-form" class="panel-body" novalidate>
+          <label for="message">Текст заявки</label>
+          <textarea id="message" name="message" rows="8" aria-describedby="message-hint" placeholder="Например:&#10;Здравствуйте! Подскажите, когда будет доставка заказа." spellcheck="true"></textarea>
+          <div class="input-note">
+            <p id="message-hint" class="hint input-help">Добавьте сообщение целиком — с деталями и вопросами.</p>
+            <p id="message-error" class="hint input-error">Введите текст заявки. Одних пробелов недостаточно.</p>
+          </div>
+          <div class="form-actions"><button id="submit" class="submit" type="submit">Подготовить черновик</button></div>
+        </form>
+      </section>
+      <section id="result" class="panel result-panel" data-status="idle" aria-labelledby="result-heading">
+        <div class="panel-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M13 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M10 14l1-4L19 2l3 3-8 8-4 1ZM17 4l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h2 id="result-heading">Результат разбора</h2>
+          <span id="status-badge" class="badge">Ожидает заявку</span>
+        </div>
+        <div class="panel-body result-body">
+          <div class="status-box">
+            <svg class="status-symbol status-info" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M12 11v5M12 7.5v.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <svg class="status-symbol status-check" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="m8 12 3 3 5-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg class="status-symbol status-warning" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m10.3 4.5-8 14A1.7 1.7 0 0 0 3.8 21h16.4a1.7 1.7 0 0 0 1.5-2.5l-8-14a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.5"/><path d="M12 9v5M12 17.2v.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            <svg class="status-symbol status-loading" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5" opacity=".2"/><path d="M12 4a8 8 0 0 1 8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true">Введите текст заявки — здесь появится результат разбора.</p>
+          </div>
+          <div class="result-fields">
+            <div class="topic-row">
+              <label for="topic">Тема</label>
+              <select id="topic" name="topic" disabled>
+                <option value="">Выберите тему</option>
+                <option value="delivery">Доставка</option>
+                <option value="pricing">Стоимость</option>
+                <option value="other">Другое</option>
+              </select>
+            </div>
+            <label for="draft">Черновик ответа</label>
+            <textarea id="draft" name="draft" rows="6" aria-describedby="draft-hint" placeholder="Напишите ответ клиенту…" disabled spellcheck="true"></textarea>
+            <div class="draft-note">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 4 5 5M4 20l5-1L20 8a2 2 0 0 0-4-4L5 15l-1 5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              <p id="draft-hint" class="hint">Проверьте детали и отредактируйте ответ перед отправкой.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <footer class="page-footer">
+      <p>Отправка клиенту — вручную, после вашей проверки.</p>
+      <span class="footer-flow" aria-hidden="true">Заявка<svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M3 10h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Тема<svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M3 10h14m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Ответ</span>
+    </footer>
+  </main>
+  <noscript><p>Для автоматического разбора включите JavaScript в браузере.</p></noscript>
+  <script type="module" src="/app.mjs"></script>
 </body>
 </html>
